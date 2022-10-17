@@ -39,11 +39,24 @@ def check_solution(solution, N):
     else:
         return (False, solution)
 
+# Pruning, if I already found a valid solution that has N elements I cannot optimize further
+def reached(solution, N):
+    if not solution[0]:
+        return False
+    if len(solution[1]) == 0:
+        return False
+    # Check if the optimal number of elements has been already reached
+    if sum(len(l) for l in solution[1]) == N:
+        return True
+    else:
+        return False
+
 # Breadth-First search
 def tree_explorer_BF(space, N):
     """ Function that produce the best solution. It can be computationally too massive """
     level = 0
     nodes = []
+    exit = 0
     solution = list()
     for i in range(1,N):
         nod = 0
@@ -54,7 +67,12 @@ def tree_explorer_BF(space, N):
                 if len(solution) == 0 or sum(len(e) for e in solution[1]) > sum(len(e) for e in isCorrect[1]): # check if the solution found is better than the already existing solution
                     solution = isCorrect
                     level = i
+                    if len(solution) != 0 and reached(solution, N):
+                        exit = 1
+                        break
         nodes.append(nod)
+        if exit:
+            break
         if level != 0 and level+1 <= i:
             break
     if len(solution) != 0:
