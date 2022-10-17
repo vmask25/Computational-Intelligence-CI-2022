@@ -14,8 +14,8 @@ Once found a solution, it explores the subsequent level in order to be sure not 
 
 | N | Processed nodes | Number of Elements (weight) |
 |---|---|---|
-|5      |2625|5|
-|10     |20875|10|
+|5      |325|5|
+|10     |1275|10|
 |20     |331211|23|
 |100    |-|-|
 |500    |-|-|
