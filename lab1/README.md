@@ -28,3 +28,7 @@ There is something that could minimize the number of processed nodes, such as A*
 
 - [Marco Sacchet](https://github.com/saccuz)
 - [Fabrizio Sulpicio](https://github.com/Xiusss)
+
+## other_solutions
+In the other solutions folder are present other solutions provided by the Professor Giovanni Squillero with some comments noted during lessons by myself (their quality and correctness is not guaranteed), and a slightly improved version of my solution. \
+Professor's repository took as reference: https://github.com/squillero/computational-intelligence
