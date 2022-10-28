@@ -25,7 +25,9 @@ def hc(N, all_lists):
     # doing this (tuple(set(_))) you cut a lot the search space, because we are not interested in duplicates
     # and doing also the SORTED allows to avoid that (1,2) and (2,1) are considered different, so you are cutting further the search space
     # (anyway this is useless when N increases because lists are getting sparser) 
+    logging.debug(f"Original: {len(all_lists)}")
     all_lists = set(tuple(sorted(set(_))) for _ in all_lists)
+    logging.debug(f"Optimized: {len(all_lists)}")
     # the REPRESENTATION is a set of tuples (because faster/simpler in doing set operations)
     #print(all_lists)
 
