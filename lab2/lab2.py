@@ -5,12 +5,12 @@ import numpy as np
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
-NUM_GENERATIONS = 500
+NUM_GENERATIONS = 1000
 
-N=20
+N=500
 
-POPULATION_SIZE = 70        #100 o 70
-OFFSPRING_SIZE = 70         #40
+POPULATION_SIZE = 30        #100 o 70
+OFFSPRING_SIZE = 20         #40
 
 #PROBLEMS: 
 # -con valori diversi di popolazione e offspring size non trovava soluzioni valide, arrivavamo a elitarismo di soluzioni non valide,
@@ -25,8 +25,6 @@ def problem(N, seed=None):
         list(set(random.randint(0, N - 1) for n in range(random.randint(N // 5, N // 2))))
         for n in range(random.randint(N, N * 5))
     ]
-
-nodes = 0
 
 seed = 42
 
@@ -52,21 +50,24 @@ def fitness(genome, space):
     for i, _ in enumerate(genome):
         if _:
             sol.append(space[i])
-    #print(sol)
     collisions_ = collisions(sol)
-    #print(collisions_)
 
     check_set = set()
     for e in sol:
         check_set |= set(e)
     how_many_covered = len(check_set)
-    #print(check_set)
-    #print(f"len : how_many_covered")
+    
     #if how_many_covered == N:
     #    return -((collisions_))   # + (N - how_many_covered)*0.1)#-collisions_
     #else:
     #    return -((collisions_)*0.1 + (N - how_many_covered)*0.9)
-    fit= -((collisions_)*0.1 + (N - how_many_covered)*0.9)  # da RIVEDERE, come dai più priorità al numero di numeri coperti?
+    
+    
+    #fit= -((collisions_)*0.1 + (N - how_many_covered)*0.9)  # da RIVEDERE, come dai più priorità al numero di numeri coperti?
+    
+    fit = (how_many_covered, -collisions_)
+    
+    
     #    # dubbio: con numeri grandi cosa succede?
     ##fit= -((collisions_) + (N - how_many_covered))
     return fit
@@ -79,6 +80,12 @@ def mutation(g):
     # Reversing one of the 1/0 in a random point of the individual/genome
     #return g[:point] + (1 - g[point],) + g[point + 1 :]
     mutated = g[:point] + (1 - g[point],) + g[point + 1 :]
+
+    #point = random.randint(0, PROBLEM_SIZE - 1)
+    ## Reversing one of the 1/0 in a random point of the individual/genome
+    ##return g[:point] + (1 - g[point],) + g[point + 1 :]
+    #mutated = mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
+    
     point = random.randint(0, PROBLEM_SIZE - 1)
     # Reversing one of the 1/0 in a random point of the individual/genome
     return mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
@@ -87,22 +94,14 @@ def cross_over(g1, g2):
     cut = random.randint(0, PROBLEM_SIZE)
     return g1[:cut] + g2[cut:]
 
-#for N in [5]:#, 10, 20, 100, 500, 1000]:
-
-#new_space = list()
-#for _tuple in space:
-#    _list = list()
-#    for _el in _tuple:
-#        _list.append(_el)
-#    new_space.append(_list)
-#print(new_space)
-#print(len(new_space))
-#
-#fitness([1, 1, 0, 0, 0, 0, 0, 1, 0, 0], space)
-
 population = list()
-for genome in [tuple([random.choice([1, 0]) for _ in range(PROBLEM_SIZE)]) for _ in range(POPULATION_SIZE)]:
-    population.append(genome)
+for genome in [tuple([0 for _ in range(PROBLEM_SIZE)]) for _ in range(POPULATION_SIZE)]:
+    point = random.randint(0, PROBLEM_SIZE - 1)
+    mutated = genome[:point] + (1,) + genome[point + 1 :]
+    population.append(mutated)
+
+for _ in population:
+    print(_)
 
 population = sorted(population, key=lambda i: fitness(i,space), reverse=True)
 #for _ in population:
@@ -111,7 +110,6 @@ population = sorted(population, key=lambda i: fitness(i,space), reverse=True)
 exit_ = 0
 for g in range(NUM_GENERATIONS):
     offspring = list()
-    print(g)
     for i in range(OFFSPRING_SIZE):
         if random.random() < 0.3:
             p = tournament(population)
@@ -124,43 +122,39 @@ for g in range(NUM_GENERATIONS):
         offspring.append(o)
             
         ############################################
-        sol_intermedia = list()
-        for i, _ in enumerate(population[0]):
-            if _:
-                sol_intermedia.append(space[i])
-        check_set = set()
-       
-        for e in sol_intermedia:
-            check_set |= set(e)
-        how_many_covered = len(check_set)
-        if N==20 and how_many_covered == 20 and collisions(sol_intermedia) == 3: 
-            exit_ = 1
-            print(f"FOUND at {g+1}")
-            break
-        if N==10 and how_many_covered == 10 and collisions(sol_intermedia) == 0: 
-            exit_ = 1
-            print(f"FOUND at {g+1}")
-            break
-        if N==5 and how_many_covered == 5 and collisions(sol_intermedia) == 0: 
-            exit_ = 1
-            print(f"FOUND at {g+1}")
-            break
+        #sol_intermedia = list()
+        #for i, _ in enumerate(population[0]):
+        #    if _:
+        #        sol_intermedia.append(space[i])
+        #check_set = set()
+       #
+        #for e in sol_intermedia:
+        #    check_set |= set(e)
+        #how_many_covered = len(check_set)
+        #if N==20 and how_many_covered == 20 and collisions(sol_intermedia) == 3: 
+        #    exit_ = 1
+        #    print(f"FOUND at {g+1}")
+        #    break
+        #if N==10 and how_many_covered == 10 and collisions(sol_intermedia) == 0: 
+        #    exit_ = 1
+        #    print(f"FOUND at {g+1}")
+        #    break
+        #if N==5 and how_many_covered == 5 and collisions(sol_intermedia) == 0: 
+        #    exit_ = 1
+        #    print(f"FOUND at {g+1}")
+        #    break
         ############################################
     population += offspring
     population = sorted(population, key=lambda i: fitness(i,space), reverse=True)[:POPULATION_SIZE]
+    print(fitness(population[0], space), g+1)
     if exit_:
         break
 
 ############################################
-#for _ in population:
-#    print(f"{_}, {fitness(_, space)}")
-
-
 sol_fin = list()
 for i, _ in enumerate(population[0]):
     if _:
         sol_fin.append(space[i])
-
 
 print(f"Best solution up to now ({NUM_GENERATIONS} generations): {sol_fin}")
 check_set = set()
@@ -170,4 +164,7 @@ how_many_covered = len(check_set)
 print(f"How many covered: {how_many_covered}")
 print(f"Collisions: { collisions(sol_fin)}")
 print(f"Weight: {sum(len(_) for _ in sol_fin)}")
+print(f"Population size: {POPULATION_SIZE}")
+print(f"Offspring size: {OFFSPRING_SIZE}")
+print(f"Generations: {NUM_GENERATIONS}")
 ############################################
