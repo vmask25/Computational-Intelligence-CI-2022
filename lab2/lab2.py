@@ -7,12 +7,12 @@ import time
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
-NUM_GENERATIONS = 1000
+NUM_GENERATIONS = 5000
 
-N=10
+N=1000
 
 POPULATION_SIZE = 30        #100 o 70
-OFFSPRING_SIZE = 20         #40
+OFFSPRING_SIZE = 20         #40    (5 e 3, 30 e 20, 70 e 70, 70 e 40, 150 e 100)
 
 #PROBLEMS: 
 # OLD-con valori diversi di popolazione e offspring size non trovava soluzioni valide, arrivavamo a elitarismo di soluzioni non valide,
@@ -79,19 +79,29 @@ def tournament(population, tournament_size=2):
 
 # The mutation is made by 2 bit tilts, so two lists between the current genome lists are taken/untaken
 def mutation(g):
-    point = random.randint(0, PROBLEM_SIZE - 1)
+    #Marco
+    point1 = random.randint(0, PROBLEM_SIZE - 1)
     # Reversing one of the 1/0 in a random point of the individual/genome
-    #return g[:point] + (1 - g[point],) + g[point + 1 :]
-    mutated = g[:point] + (1 - g[point],) + g[point + 1 :]
+    mutated = g[:point1] + (1 - g[point1],) + g[point1 + 1 :]
+    point2 = random.randint(0, PROBLEM_SIZE - 1)
+    if point2 == point1:
+        if point1 == PROBLEM_SIZE -1:
+            point2 -= 1
+        elif point1 == 0:
+            point2 += 1
+        else:
+            point2 = point1 - 1
+    # Reversing one of the 1/0 in a random point of the individual/genome
+    return mutated[:point2] + (1 - mutated[point2],) + mutated[point2 + 1 :]
 
+    #Simo
     #point = random.randint(0, PROBLEM_SIZE - 1)
     ## Reversing one of the 1/0 in a random point of the individual/genome
     ##return g[:point] + (1 - g[point],) + g[point + 1 :]
-    #mutated = mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
-    
-    point = random.randint(0, PROBLEM_SIZE - 1)
-    # Reversing one of the 1/0 in a random point of the individual/genome
-    return mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
+    #mutated = g[:point] + (1 - g[point],) + g[point + 1 :]    
+    #point = random.randint(0, PROBLEM_SIZE - 1)
+    ## Reversing one of the 1/0 in a random point of the individual/genome
+    #return mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
 
 # The xover is a basic xover in which the result is composed by a slice of each of the two parents.
 def cross_over(g1, g2):
@@ -156,15 +166,14 @@ for g in range(NUM_GENERATIONS):
     population += offspring
     population = sorted(population, key=lambda i: fitness(i,space), reverse=True)[:POPULATION_SIZE]
     fittest = fitness(population[0], space)
-    last_10_fittest.append(fittest)
-    print("Prova ", len(last_10_fittest))
-    if len(last_10_fittest) == 10 and len(set(last_10_fittest)) == 1:
-        print("Ciaoooooooo")
-        last_10_fittest = list()
-        if mutation_rate < 0.9:
-            mutation_rate = mutation_rate + 0.1
+    #last_10_fittest.append(fittest)
+    #if len(last_10_fittest) == 10 and not len(set(last_10_fittest)) == 1:
+    #    last_10_fittest.pop(0)    
+    #if len(last_10_fittest) == 10 and len(set(last_10_fittest)) == 1:
+    #    last_10_fittest = list()
+    #    if mutation_rate < 0.8:
+    #        mutation_rate = mutation_rate + 0.1
     print(fittest, g+1, mutation_rate)
-    time.sleep(0.5)
     if exit_:
         break
 
