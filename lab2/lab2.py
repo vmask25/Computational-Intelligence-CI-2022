@@ -2,21 +2,23 @@ import random
 from itertools import combinations
 import logging
 import numpy as np
+# just for debugging
+import time
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 NUM_GENERATIONS = 1000
 
-N=500
+N=10
 
 POPULATION_SIZE = 30        #100 o 70
 OFFSPRING_SIZE = 20         #40
 
 #PROBLEMS: 
-# -con valori diversi di popolazione e offspring size non trovava soluzioni valide, arrivavamo a elitarismo di soluzioni non valide,
+# OLD-con valori diversi di popolazione e offspring size non trovava soluzioni valide, arrivavamo a elitarismo di soluzioni non valide,
 #     forse non stiamo dando il giusto peso alle cose, il fatto di trovare una soluzione valida (che copra tutti gli N numeri) non viene sempre
 #     rispettata (rivedi fitness function con quelle proporzioni)
-# -rivedere la fitness function
+# OLD-rivedere la fitness function
 
 # List of lists generator
 def problem(N, seed=None):
@@ -28,9 +30,9 @@ def problem(N, seed=None):
 
 seed = 42
 
-space = set(tuple(sorted(set(_))) for _ in problem(N, seed))
+space = list(set(tuple(sorted(set(_))) for _ in problem(N, seed)))
+
 print(f"The search space is: \n{space}")
-space = list(_ for _ in space)
 
 PROBLEM_SIZE = len(space)
 
@@ -75,6 +77,7 @@ def fitness(genome, space):
 def tournament(population, tournament_size=2):
     return max(random.choices(population, k=tournament_size), key=lambda i: fitness(i, space))
 
+# The mutation is made by 2 bit tilts, so two lists between the current genome lists are taken/untaken
 def mutation(g):
     point = random.randint(0, PROBLEM_SIZE - 1)
     # Reversing one of the 1/0 in a random point of the individual/genome
@@ -90,28 +93,34 @@ def mutation(g):
     # Reversing one of the 1/0 in a random point of the individual/genome
     return mutated[:point] + (1 - mutated[point],) + mutated[point + 1 :]
 
+# The xover is a basic xover in which the result is composed by a slice of each of the two parents.
 def cross_over(g1, g2):
     cut = random.randint(0, PROBLEM_SIZE)
     return g1[:cut] + g2[cut:]
 
+
+########## Main
+
+# The initial population is randomly created with bitmaps of 0's and only one "1" randomly choosen
 population = list()
 for genome in [tuple([0 for _ in range(PROBLEM_SIZE)]) for _ in range(POPULATION_SIZE)]:
     point = random.randint(0, PROBLEM_SIZE - 1)
     mutated = genome[:point] + (1,) + genome[point + 1 :]
     population.append(mutated)
 
-for _ in population:
-    print(_)
+# Initial population printing
+#for _ in population:
+#    print(_, "\n")
 
 population = sorted(population, key=lambda i: fitness(i,space), reverse=True)
-#for _ in population:
-#    print(f"{_}, {fitness(_, space)}")
 
-exit_ = 0
+mutation_rate = 0.3
+exit_ = 0 
+last_10_fittest = list()
 for g in range(NUM_GENERATIONS):
     offspring = list()
     for i in range(OFFSPRING_SIZE):
-        if random.random() < 0.3:
+        if random.random() < mutation_rate:
             p = tournament(population)
             o = mutation(p)
         else:
@@ -127,7 +136,7 @@ for g in range(NUM_GENERATIONS):
         #    if _:
         #        sol_intermedia.append(space[i])
         #check_set = set()
-       #
+        #
         #for e in sol_intermedia:
         #    check_set |= set(e)
         #how_many_covered = len(check_set)
@@ -146,21 +155,30 @@ for g in range(NUM_GENERATIONS):
         ############################################
     population += offspring
     population = sorted(population, key=lambda i: fitness(i,space), reverse=True)[:POPULATION_SIZE]
-    print(fitness(population[0], space), g+1)
+    fittest = fitness(population[0], space)
+    last_10_fittest.append(fittest)
+    print("Prova ", len(last_10_fittest))
+    if len(last_10_fittest) == 10 and len(set(last_10_fittest)) == 1:
+        print("Ciaoooooooo")
+        last_10_fittest = list()
+        if mutation_rate < 0.9:
+            mutation_rate = mutation_rate + 0.1
+    print(fittest, g+1, mutation_rate)
+    time.sleep(0.5)
     if exit_:
         break
 
-############################################
+############################################ STATISTICS and RESUME PRINTING
 sol_fin = list()
 for i, _ in enumerate(population[0]):
     if _:
         sol_fin.append(space[i])
 
-print(f"Best solution up to now ({NUM_GENERATIONS} generations): {sol_fin}")
 check_set = set()
 for e in sol_fin:
     check_set |= set(e)
 how_many_covered = len(check_set)
+print(f"Best solution up to now ({NUM_GENERATIONS} generations): {sol_fin}")
 print(f"How many covered: {how_many_covered}")
 print(f"Collisions: { collisions(sol_fin)}")
 print(f"Weight: {sum(len(_) for _ in sol_fin)}")
