@@ -9,11 +9,14 @@ from gx_utils import *
 def problem(N, seed=None):
     """Creates an instance of the problem"""
 
+    state = random.getstate()
     random.seed(seed)
-    return [
+    p = [
         list(set(random.randint(0, N - 1) for n in range(random.randint(N // 5, N // 2))))
         for n in range(random.randint(N, N * 5))
     ]
+    random.setstate(state)
+    return p
 
 # Hill Climbing is an algorithm that is not correct for sure, it's not guaranteed that it finds the optimal solution,
 # neither that it finds a solution, but

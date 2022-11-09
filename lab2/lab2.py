@@ -10,13 +10,39 @@ NUM_GENERATIONS = 1000
 POPULATION_SIZE = 30        
 OFFSPRING_SIZE =  20        # Other possible values (5 and 3, 30 and 20, 70 and 70, 70 and 40, 150 and 100 and others)
 
-# List of lists generator
+# Call Counter annotation for fitness functions
+__CALLS__ = dict()
+
+def CallCounter(fn):
+    """Annotation @CallCounter"""
+    assert fn.__name__ not in __CALLS__, f"Function '{fn.__name__}' already listed in __CALLS__"
+    __CALLS__[fn.__name__] = 0
+    logging.debug(f"CallCounter: Counting __CALLS__['{fn.__name__}'] ({fn})")
+
+    def call_count(*args, **kwargs):
+        __CALLS__[fn.__name__] += 1
+        return fn(*args, **kwargs)
+
+    return call_count
+
+# List of lists generator (old function that "bias" the random generator with the seed = 42)
+#def problem(N, seed=None):
+#    random.seed(seed)
+#    return [
+#        list(set(random.randint(0, N - 1) for n in range(random.randint(N // 5, N // 2))))
+#        for n in range(random.randint(N, N * 5))
+#    ]
+
+# New Professor's version of the problem generation (it restores the initial random state (not "biased" by the seed 42))
 def problem(N, seed=None):
+    state = random.getstate()
     random.seed(seed)
-    return [
+    p = [
         list(set(random.randint(0, N - 1) for n in range(random.randint(N // 5, N // 2))))
         for n in range(random.randint(N, N * 5))
     ]
+    random.setstate(state)
+    return p
 
 # Counts the number of collisions in the current solution (duplicated covered numbers)
 def collisions(sol):
@@ -46,6 +72,7 @@ def covered_numbers(sol):
     return len(check_set)
 
 # Fitness function
+@CallCounter
 def fitness(genome, space):
     sol = bitmap_to_search_space(genome, space)
     collisions_ = collisions(sol)
@@ -91,7 +118,7 @@ for N in [5,10,20,22,50,100,500,1000,2000,5000,10000]:
     space = list(set(tuple(sorted(set(_))) for _ in problem(N, seed)))
 
     PROBLEM_SIZE = len(space)
-    fitness_calls = 0
+    # fitness_calls = 0 old way to count the fitness calls
     # The initial population is randomly created with bitmaps of 0's and only one "1" randomly choosen
     population = list()
     for genome in [tuple([0 for _ in range(PROBLEM_SIZE)]) for _ in range(POPULATION_SIZE)]:
@@ -103,7 +130,7 @@ for N in [5,10,20,22,50,100,500,1000,2000,5000,10000]:
         population.append(mutated)
 
     population = sorted(population, key=lambda i: fitness(i,space), reverse=True)
-    fitness_calls += len(population)
+    # fitness_calls += len(population)  old way to count the fitness calls
     mutation_rate = 0.3
     #last_10_fittest = list()
     for g in range(NUM_GENERATIONS):
@@ -120,11 +147,11 @@ for N in [5,10,20,22,50,100,500,1000,2000,5000,10000]:
                 
         population += offspring
         population = sorted(population, key=lambda i: fitness(i,space), reverse=True)[:POPULATION_SIZE]
-        fitness_calls += len(population)
+        # fitness_calls += len(population)  old way to count the fitness calls
         fittest = fitness(population[0], space)
         if g in [NUM_GENERATIONS//4, NUM_GENERATIONS//2,NUM_GENERATIONS-NUM_GENERATIONS//4, NUM_GENERATIONS-1]:
             print(f"Status: {100 * (g+1) // NUM_GENERATIONS}%\t- Fit: {fittest}")
-        fitness_calls += 1
+        # fitness_calls += 1  old way to count the fitness calls
 
         # This was an attempt to avoid the flatness increasing the mutation rate if the fittest individuals in the last
         # 10 generation didn't evolved anything, but it didn't make such great changes, maybe an improvable idea.
@@ -151,6 +178,6 @@ for N in [5,10,20,22,50,100,500,1000,2000,5000,10000]:
     print(f"Population size: {POPULATION_SIZE}")
     print(f"Offspring size: {OFFSPRING_SIZE}")
     print(f"Generations: {NUM_GENERATIONS}")
-    print(f"Fittness calls: {fitness_calls}")
+    print(f"Fittness calls: {__CALLS__['fitness']}")
     print(f"Computational time: {(end - start)//60} mins and {(end-start)-(((end - start)//60)*60)} secs")
     ############################################

@@ -35,6 +35,10 @@ Here is reported a table in which we report the weight results for different val
 ## Improvements
 We are sure that some improvements in the logic of the genetic algorithm are possible, some improving ideas we had are only cited in comments directly in the code, but we are open to suggestions and critics about our versions.
 
+## After deadline additions
+I integrated in my code the new version of the problem generation function, provided by the Professor, that this time restores the initial state of the random generator instead of leaving the seed 42.\
+Another thing is the CallCounter annotation (again provided by the Professor) to count the calls to the fitness function in order to get an idea of how heavy is the algorithm.
+
 ## Contributors
 
 - [Marco Sacchet](https://github.com/saccuz)
