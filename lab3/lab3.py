@@ -13,6 +13,7 @@ GENM_SIZE = 2
 RESULT_TRESH = .3
 EVOL_STEP = .05
 
+# Generation of an individual as a dna of two strategies/rules that represent "a strategy"
 def generate_individual(genome: list) -> list:
     dna = list()
     while len(dna) < GENM_SIZE:
@@ -29,6 +30,7 @@ def make_strategy(dna: list) -> Strategy:
 
     return Strategy(used_tactics)
 
+# Updates the genome probabilities based on the results with a certain dna
 def evolve_genome(dna: list, results: float, genome: list) -> None:
     if results >= RESULT_TRESH:
         for i in range(len(genome)):
@@ -43,6 +45,8 @@ def evolve_genome(dna: list, results: float, genome: list) -> None:
             else:
                 genome[i] += EVOL_STEP
 
+# Returns the results of the evaluation of the current strategy.
+# The first who moves is randomly chosen each time.
 def evaluate(player1: Strategy, player2: Strategy) -> float:
     won = 0
     for m in range(NUM_MATCHES):
@@ -78,8 +82,11 @@ if __name__ == "__main__":
         champion = [0,[]]
         print(f"Playing against {op_strat[turn]}")
         for generation in tqdm(range(GENERATIONS), desc="Playing", ascii=False):
+            # An individual is generated at each generation. It's composed by a couple of rules and it's intended as a "strategy"
             individual = generate_individual(genome)
+            # Calculating the results of the evaluation of the current individual against the current turn opponent
             results = evaluate(make_strategy(individual), nim.opponent_strategy(turn))
+            # Updating the current champion only if the results are better than the previous one
             if results > champion[0]:
                 champion[1] = individual
                 champion[0] = results
@@ -89,6 +96,7 @@ if __name__ == "__main__":
                 win += 1
             else:
                 lose += 1
+            # Updates the genome overall probabilities based on the results of the current individual
             evolve_genome(individual, results, genome)
         print_genome(champion[1])
     for x in zip(nim.tactics,genome):
@@ -96,13 +104,20 @@ if __name__ == "__main__":
     logging.debug(f"mean: {mean_/GENERATIONS}")
     logging.debug(f"victory: {win/GENERATIONS *100}%")
     print("-----------------------")
+    # The last assigned champion strategy is the one resulted by competing against the optimal_strategy, 
+    # which is something that usually works fine with the otpimal opponent, but works bad with the other turns oppontents.
     print(f"Last assigned champion vs optimal: {evaluate(make_strategy(champion[1]),nim.opponent_strategy(3))}")
     selected = list(map(genome.index, heapq.nlargest(GENM_SIZE, genome)))
+    # Here is printed the evolved genome
     print("Evolved genome:")
     print_genome(selected)
+    # Evolved is compared to the optimal, and it ALWAYS fails 100% unfortunately, still doing well with other 3 turns opponents
     print(f"Evolved vs optimal: {evaluate(make_strategy(selected),nim.opponent_strategy(3))}")
+    # The Evolved strategy competes with the last updated champion to see which one is the better
     tourn = evaluate(make_strategy(selected),make_strategy(champion[1]))
     print(f"Evolved vs last assigned champion: {tourn}/{1-tourn}")
+    # If the champion who behaves better with the optimal wins also against the evolved one, than the last updated champion is taken as overall champion
+    # (it could happen because it is anyway evolved so it's possible, but infrequent)
     if tourn > 0.5:
         champion = selected
     else:
