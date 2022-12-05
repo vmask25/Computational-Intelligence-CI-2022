@@ -116,9 +116,10 @@ if __name__ == "__main__":
 #              longest_row   - gabriele
 #              pick_even_max - pick_one_from_max   <= ALSO THIS IS MORE OR LESS GOOD
 #              gabriele      - shortest_row        <= THIS IS VERY GOOD WITH THE FIRST TWO OPPONENTS, BUT VERY BAD WITH THE gabriele and optimal 
+               # trying with a dna of 3 strategies/rules also pick_even_max - gabriele - longest_row is not that bad    <=
     #champion common results: 
 #              pick_odd_max  - pick_one_from_min
 #              pick_one_from_max - pick_odd_max
 #    
-    #print(f"Your choice vs Your choice: {evaluate(make_strategy([0,1]), nim.opponent_strategy(3))}")
-    #print(f"Your choice vs Your choice: {evaluate(make_strategy([5,3]), nim.opponent_strategy(2))}")
+#    print(f"Your choice vs Your choice: {evaluate(make_strategy([0,1]), nim.opponent_strategy(1))}")
+#    print(f"Your choice vs Your choice: {evaluate(make_strategy([5,3]), nim.opponent_strategy(1))}")
