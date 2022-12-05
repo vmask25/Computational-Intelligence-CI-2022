@@ -6,7 +6,7 @@ Write agents able to play Nim, with an arbitrary number of rows and an upper bou
 
 The player taking the last object wins.
 
-Task3.1: An agent using fixed rules based on nim-sum (i.e., an expert system)
+Task3.1: An agent using fixed rules based on nim-sum (i.e., an expert system) \
 Task3.2: An agent using evolved rules
 
 The current code is actually the one to solve the Task3.2 because the 3.1 is simply a "static" version of the 3.2 (static meant as not evolving the strategies/rules, but the initial fixed rules were the same 7 we used in the evolutionary one).
