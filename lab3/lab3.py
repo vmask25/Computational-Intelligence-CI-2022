@@ -136,5 +136,6 @@ if __name__ == "__main__":
 #              pick_odd_max  - pick_one_from_min
 #              pick_one_from_max - pick_odd_max
 #    
-#    print(f"Your choice vs Your choice: {evaluate(make_strategy([0,1]), nim.opponent_strategy(1))}")
-#    print(f"Your choice vs Your choice: {evaluate(make_strategy([5,3]), nim.opponent_strategy(1))}")
+#   This three long dna strategies seem to defeat the optimal strategy (still to check)
+#    print(f"Your choice vs Your choice: {evaluate(make_strategy([5,6,4]), nim.opponent_strategy(3))}")
+#    print(f"Your choice vs Your choice: {evaluate(make_strategy([6,4,5]), nim.opponent_strategy(3))}")

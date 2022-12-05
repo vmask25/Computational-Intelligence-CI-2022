@@ -42,10 +42,24 @@ An idea we didn't try to implement yet is to have rules that are more "situation
               pick_odd_max  - pick_one_from_min 
               pick_one_from_max - pick_odd_max 
 
+## More interesting (but maybe strange) results
+Trying our algorithm with a dna of 3 rules instead of only 2 it resulted in having an evolved strategy that does not work very well overall, but we noticed that the last updated champion (the one who result from the last evolution turn against the optimal opponent) wons more or less 98-100% times against the optimal opponent, which is a "strange" thing because we thought that beginning as second, the optimal strategy should always win.
+### Here are more detailed results:
+    pick_odd_max
+    pick_one_from_min
+    pick_even_max
+    # Last assigned champion vs optimal: 0.98 (98% of wins in the 100 matches)
+    
+    pick_even_max
+    pick_odd_max
+    pick_one_from_min
+    # Last assigned champion vs optimal: 1.0 (100% of wins in the 100 matches)
+We will analyze better these results and we will try to understand better why this happens and if we didn't make mistakes somewhere.
+
 ## Contributors
 
 - [Marco Sacchet](https://github.com/saccuz)
-- [Fabrizio Sulpicio](https://github.com/Xiusss)
+- [Fabrizio Sulpizio](https://github.com/Xiusss)
 
 ## OLD_tries
 In the OLD_tries folder are present other old mid-attempts done throughout the process (you can ignore the folder, it's just to keep saves of previous/initial versions). \
