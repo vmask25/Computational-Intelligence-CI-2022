@@ -73,8 +73,8 @@ if __name__ == "__main__":
     lose = 0
     champion = [0,[]] 
     genome = [.5]*len(nim.tactics)
-    op_strat = ['pure random','gabriele','optimal'] 
-    for turn in range(3):
+    op_strat = ['dumb_strategy','pure random','gabriele','optimal'] 
+    for turn in range(len(op_strat)):
         champion = [0,[]]
         print(f"Playing against {op_strat[turn]}")
         for generation in tqdm(range(GENERATIONS), desc="Playing", ascii=False):
@@ -95,16 +95,30 @@ if __name__ == "__main__":
         logging.info(x[0].__name__, x[1])
     logging.debug(f"mean: {mean_/GENERATIONS}")
     logging.debug(f"victory: {win/GENERATIONS *100}%")
-    print(f"Champion: {evaluate(make_strategy(champion[1]),nim.opponent_strategy(2))}")
+    print("-----------------------")
+    print(f"Last assigned champion vs optimal: {evaluate(make_strategy(champion[1]),nim.opponent_strategy(3))}")
     selected = list(map(genome.index, heapq.nlargest(GENM_SIZE, genome)))
-    print(f"Evolved: {evaluate(make_strategy(selected),nim.opponent_strategy(2))}")
     print("Evolved genome:")
     print_genome(selected)
+    print(f"Evolved vs optimal: {evaluate(make_strategy(selected),nim.opponent_strategy(3))}")
     tourn = evaluate(make_strategy(selected),make_strategy(champion[1]))
-    print(f"Tournament: evolved vs last champion: {tourn}/{1-tourn}")
+    print(f"Evolved vs last assigned champion: {tourn}/{1-tourn}")
     if tourn > 0.5:
         champion = selected
     else:
         champion = champion[1]
     print("Best genome overall:")
     print_genome(champion)
+
+    #evolved common results:  
+#              gabriele      - pick_odd_max
+#              gabriele      - pick_even_max       <= BEST ONE FOUND THAT OVERALL WINS almost more than 50% (except vs the optimal opponent)
+#              longest_row   - gabriele
+#              pick_even_max - pick_one_from_max   <= ALSO THIS IS MORE OR LESS GOOD
+#              gabriele      - shortest_row        <= THIS IS VERY GOOD WITH THE FIRST TWO OPPONENTS, BUT VERY BAD WITH THE gabriele and optimal 
+    #champion common results: 
+#              pick_odd_max  - pick_one_from_min
+#              pick_one_from_max - pick_odd_max
+#    
+    #print(f"Your choice vs Your choice: {evaluate(make_strategy([0,1]), nim.opponent_strategy(3))}")
+    #print(f"Your choice vs Your choice: {evaluate(make_strategy([5,3]), nim.opponent_strategy(2))}")
