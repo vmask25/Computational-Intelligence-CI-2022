@@ -9,7 +9,7 @@ from nim import Nim, Strategy
 GENERATIONS = 100
 NUM_MATCHES = 100
 NIM_SIZE=10
-GENM_SIZE = 3
+GENM_SIZE = 2
 RESULT_TRESH = .3
 EVOL_STEP = .05
 
