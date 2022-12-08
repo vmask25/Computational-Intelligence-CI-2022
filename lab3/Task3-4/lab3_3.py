@@ -1,8 +1,10 @@
-from copy import deepcopy
+import random
+from nim import Nim, Strategy
 import nim
-from nim import Nim
+from copy import deepcopy
+import time
 
-NIM_SIZE=3
+NIM_SIZE=8
 
 def evaluation(state: Nim) -> int:
     if not state:
@@ -10,58 +12,67 @@ def evaluation(state: Nim) -> int:
     else:
         return 0
 
-def generate_possible_moves(board : Nim, state: dict()) -> None:
-    if board not in state:
-        state[board] = list()
+def generate_possible_moves(state : Nim):
+    possible_moves = [(r, o) for r, c in enumerate(state.rows) for o in range(1, c + 1)]
+    return possible_moves
+    
 
-    possible_moves = [(r, o) for r, c in enumerate(board.rows) for o in range(1, c + 1)]
-
-    for ply in possible_moves:
-        tmp = deepcopy(board)
-        if ply not in state.values():
-            state[board].append(ply)
-            generate_possible_moves(tmp.nimming(ply),state)
-
-def minMax(state: Nim, dict_of_states:dict(), player:int):
+def minMax(state: Nim, dict_of_states: dict()):
     val = evaluation(state)
     if val != 0:
         return None, val
 
-    moves = dict_of_states[state]
+    # Check if the moves for this states are already available
+    if state.rows not in dict_of_states and state:
+        dict_of_states[state.rows] = list()
+        moves = generate_possible_moves(state)
+        for move in moves:
+            if move not in dict_of_states[state.rows]:
+                dict_of_states[state.rows].append((move,-1))
+    # Otherwise recover them from the dictionary
+    else:
+        return max(dict_of_states[state.rows], key=lambda x: x[1])
+
     results = list()
-    
+
     for ply in moves:
-        tmp = deepcopy(state)
-        _ , val = minMax(tmp.nimming(ply), dict_of_states, 1-player)
+        tmp_state = deepcopy(state)
+        _ , val = minMax(tmp_state.nimming(ply), dict_of_states)
         results.append((ply, -val))
-        
+        if -val == 1:
+            dict_of_states[state.rows] = [(ply,-val)]
+            break
+
     return max(results, key=lambda x: x[1])
 
+#idea: salvarci nel dict già la mossa (ply) migliore
+
 if __name__ == "__main__":
+    start = time.time()
     board = Nim(NIM_SIZE)
     dict_of_states = dict()
-    generate_possible_moves(board, dict_of_states)
+    i = 1#random.randint(0,1)
+    player2 = nim.opponent_strategy()
+    while board:
+        if i % 2 != 0:
+            ply, _ = minMax(board, dict_of_states)
+            player = 0
+        else:
+            opponent = player2.move()
+            ply = opponent(board)
+            player = 1
+        board.nimming(ply)
+        i+=1
+    if player == 1:
+        print("YOU LOSE")
+    else:
+        print("YOU WIN")
+    
     sum = 0
     for _ in dict_of_states.values():
-        if len(_) != 0:
-            sum = sum+1
+        sum += len(_)
     print(sum)
     print(len(dict_of_states.keys()))
-    #i = 1#random.randint(0,1)
-    #player2 = nim.opponent_strategy()
-    #while board:
-    #    if i % 2 != 0:
-    #        ply, _ = minMax(board, dict_of_states, 1)
-    #        player = 0
-    #    else:
-    #        opponent = player2.move()
-    #        ply = opponent(board)
-    #        player = 1
-    #    board.nimming(ply)
-    #    i+=1
-    #if player == 1:
-    #    print("YOU LOSE")
-    #else:
-    #    print("YOU WIN")
 
-
+    end = time.time()
+    print(f"Computational time: {(end - start)//60} mins and {(end-start)-(((end - start)//60)*60)} secs")

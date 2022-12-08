@@ -21,9 +21,12 @@ class Nim:
     def __str__(self):
         return "<" + " ".join(str(_) for _ in self._rows) + ">"
 
+    def __hash__(self) -> int:
+        return hash(tuple(self.rows))
+
     @property
     def rows(self) -> tuple:
-        return tuple(self._rows) if len(self._rows) > 0 else tuple((0,0))
+        return tuple(self._rows)
     
     @property
     def k(self) -> int:
@@ -34,7 +37,6 @@ class Nim:
         assert self._rows[row] >= num_objects
         assert self._k is None or num_objects <= self._k
         self._rows[row] -= num_objects
-        self._rows = sorted([x for x in self._rows if x > 0])
         return self
 
 
