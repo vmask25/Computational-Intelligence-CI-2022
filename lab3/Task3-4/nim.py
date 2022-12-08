@@ -1,6 +1,4 @@
 from collections import namedtuple
-
-##########tryings
 from typing import Callable
 import random
 from copy import deepcopy
@@ -36,10 +34,6 @@ class Nim:
         self._rows[row] -= num_objects
         self._rows = sorted([x for x in self._rows if x > 0])
         return self
-
-
-
-###############Simone's tries
 
 # Strategy class
 class Strategy:
