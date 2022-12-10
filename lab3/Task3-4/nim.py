@@ -19,6 +19,9 @@ class Nim:
     def __str__(self):
         return "<" + " ".join(str(_) for _ in self._rows) + ">"
 
+    def __hash__(self) -> int:
+        return hash(tuple(self.rows))
+
     @property
     def rows(self) -> tuple:
         return tuple(self._rows) if len(self._rows) > 0 else tuple((0,0))
@@ -59,8 +62,6 @@ def opponent_strategy() -> Strategy:
 
 # Optimal function 
 def nim_sum(state: Nim) -> int:
-    #*_, result = accumulate(state.rows, xor)
-    #return result
     result = state.rows[0]
     for row in state.rows[1:]:
         result = result ^ row
@@ -70,13 +71,7 @@ def nim_sum(state: Nim) -> int:
 def cook_status(state: Nim) -> dict:
     cooked = dict()
     cooked['possible_moves'] = [(r, o) for r, c in enumerate(state.rows) for o in range(1, c + 1) if state.k is None or o <= state.k]
-    cooked['active_rows_number'] = sum(o > 0 for o in state.rows)
-    cooked['even_object_rows'] = [x[0] for x in enumerate(state.rows) if x[1] % 2 == 0 and x[1] != 0]
-    cooked['odd_object_rows'] = [x[0] for x in enumerate(state.rows) if x[1] % 2 != 0]
-    cooked['shortest_row'] = min((x for x in enumerate(state.rows) if x[1] > 0), key=lambda y:y[1])[0]
-    cooked['longest_row'] = max((x for x in enumerate(state.rows)), key=lambda y:y[1])[0]
     cooked['nim_sum'] = nim_sum(state)
-    cooked['dumb_strategy'] = [x[0] for x in enumerate(state.rows) if x[1] > 0]
 
     brute_force = list()
     for m in cooked['possible_moves']:
@@ -89,5 +84,4 @@ def cook_status(state: Nim) -> dict:
 
 def optimal_strategy(state: Nim) -> Nimply:
     data = cook_status(state)
-    #return next(m for m in data['possible_moves'] if m[1] == data['min_sum'])
     return next((bf for bf in data['brute_force'] if bf[1] == 0), random.choice(data['brute_force']))[0]
