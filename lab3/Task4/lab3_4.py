@@ -7,9 +7,9 @@ import nim
 from nim import Nim, Strategy
 from agent import Agent
 
-NIM_SIZE = 5
-NUM_MATCHES_EVAL = 100
-EPISODES = 10000
+NIM_SIZE = 10
+NUM_MATCHES_EVAL = 10
+EPISODES = 5000
 
 def evaluate(robot: Agent, player2: Strategy) -> float:
     
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     board = Nim(NIM_SIZE)
     player2 = nim.opponent_strategy()
     robot = Agent(board, alpha=0.1, random_factor=0.4)
+    best_agent = None
+    max = -1
 
     # Plot
     moveHistory = []
@@ -69,20 +71,28 @@ if __name__ == "__main__":
             moveHistory.append(results)
             indices.append(e)
 
+        if results > max:
+            max = results
+            best_agent = robot
+
         board = Nim(NIM_SIZE)
 
 
+    plt.subplot(211)
     plt.plot(indices, moveHistory, "b")
-    plt.show()
 
-    moveHistory = []
+    moveHistory2 = []
+    indices2 = []
     # Final evaluation
     for c in tqdm(range(500)):
-        results=evaluate(robot, player2)
-       #if c % 10 == 0:
-        moveHistory.append(results)
-           #indices.append(c)
-    mean_ = sum(moveHistory)/500
-    print(mean_)
-    #plt.plot(indices, moveHistory, "b")
-    #plt.show()
+        results=evaluate(robot, nim.opponent_strategy_evaluate())
+        if c % 10 == 0:
+            moveHistory2.append(results)
+            indices2.append(c)
+    mean_ = sum(moveHistory2)/500
+
+    print(f"The average winning rate with the final agent is: {mean_}")
+
+    plt.subplot(212)
+    plt.plot(indices2, moveHistory2, "b")
+    plt.show()

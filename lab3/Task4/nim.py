@@ -72,9 +72,16 @@ def gabriele(state: Nim) -> Nimply:
 
 # Opponent strategy generator (based on the evolution turn)
 def opponent_strategy() -> Strategy:
-    return Strategy([pure_random])
+    #return Strategy([pure_random])
     #return Strategy([optimal_strategy])
     #return Strategy([gabriele])
+    return new_strategy()
+
+def opponent_strategy_evaluate() -> Strategy:
+    #return Strategy([pure_random])
+    #return Strategy([optimal_strategy])
+    #return Strategy([gabriele])
+    return new_strategy()
 
 # Optimal function 
 def nim_sum(state: Nim) -> int:
@@ -89,6 +96,11 @@ def cook_status(state: Nim) -> dict:
     cooked['possible_moves'] = [(r, o) for r, c in enumerate(state.rows) for o in range(1, c + 1) if state.k is None or o <= state.k]
     cooked['nim_sum'] = nim_sum(state)
 
+    cooked['even_object_rows'] = [x[0] for x in enumerate(state.rows) if x[1] % 2 == 0 and x[1] != 0]
+    cooked['odd_object_rows'] = [x[0] for x in enumerate(state.rows) if x[1] % 2 != 0]
+    cooked['shortest_row'] = min((x for x in enumerate(state.rows) if x[1] > 0), key=lambda y:y[1])[0]
+    
+
     brute_force = list()
     for m in cooked['possible_moves']:
         tmp = deepcopy(state)
@@ -101,3 +113,41 @@ def cook_status(state: Nim) -> dict:
 def optimal_strategy(state: Nim) -> Nimply:
     data = cook_status(state)
     return next((bf for bf in data['brute_force'] if bf[1] == 0), random.choice(data['brute_force']))[0]
+
+
+def new_strategy() -> Strategy:
+    return make_strategy([5,4,6])
+    #return make_strategy([5,4])
+    #return make_strategy([5])
+    #return make_strategy([4])
+    #return make_strategy([6])
+
+
+def make_strategy(dna: list) -> Strategy:
+    used_tactics = list()
+
+    for al, _ in zip(dna, range(len(dna))):
+        used_tactics.append(tactics[al])
+
+    return Strategy(used_tactics)
+    
+# This rule picks one object from the shortest row
+def pick_one_from_min(state: Nim) -> Nimply:
+    data = cook_status(state)
+    return Nimply(data['shortest_row'], 1)
+
+# This rule picks half (+1) the objects from the even objects row that has the maximum number of objects
+def pick_even_max(state: Nim) -> Nimply:
+    data = cook_status(state)
+    info = data['even_object_rows'] if data['even_object_rows'] != [] else data['odd_object_rows']
+    row_ = max(info, key=lambda x: x)
+    return Nimply(row_, (state.rows[row_]//2)+1)
+
+# This rule picks half the objects from the odd objects row that has the maximum number of objects
+def pick_odd_max(state: Nim) -> Nimply:
+    data = cook_status(state)
+    info = data['odd_object_rows'] if data['odd_object_rows'] != [] else data['even_object_rows']
+    row_ = max(info, key=lambda x: x)
+    return Nimply(row_, state.rows[row_]//2)
+
+tactics = [gabriele,gabriele,gabriele,gabriele,pick_one_from_min,pick_even_max,pick_odd_max]
