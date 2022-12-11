@@ -16,11 +16,13 @@ class Agent(object):
         if possible_moves == None:
             possible_moves = board.possible_moves() 
         for ply in possible_moves:
-            board_tmp = deepcopy(board)
-            possible_state = board_tmp.nimming(ply)
-            if possible_state.rows not in self.G:
-                self.G[(possible_state.rows, ply)] = np.random.uniform(low=1.0, high=0.1)
+            #board_tmp = deepcopy(board)
+            #possible_state = board_tmp.nimming(ply)
+            #if possible_state.rows not in self.G:
+            if ply not in self.G:
+                #self.G[(possible_state.rows, ply)] = np.random.uniform(low=1.0, high=0.1)
                 #self.G[possible_state.rows] = np.random.uniform(low=1.0, high=0.1)
+                self.G[ply] = np.random.uniform(low=1.0, high=0.1)            
 
     def choose_action(self, board, possible_moves):
         maxG = -10e15
@@ -33,13 +35,37 @@ class Agent(object):
         else:
             # if exploiting, gather all possible actions and choose one with the highest G (reward)
             for ply in possible_moves:
-                board_tmp = deepcopy(board)
-                new_state = board_tmp.nimming(ply)
-                if self.G[(new_state.rows, ply)] >= maxG:
+                #board_tmp = deepcopy(board)
+                #new_state = board_tmp.nimming(ply)
+                #if self.G[(new_state.rows, ply)] >= maxG:
                 #if self.G[new_state.rows] >= maxG:
+                if self.G[ply] >= maxG:
                     next_move = ply
-                    maxG = self.G[(new_state.rows, ply)]
+                    #maxG = self.G[(new_state.rows, ply)]
                     #maxG = self.G[new_state.rows]
+                    maxG = self.G[ply]
+
+        return next_move
+
+    def choose_action_evaluate(self, board, possible_moves):
+        maxG = -10e15
+        next_move = None
+        # if exploiting, gather all possible actions and choose one with the highest G (reward)
+        for ply in possible_moves:
+            #board_tmp = deepcopy(board)
+            #new_state = board_tmp.nimming(ply)
+            #if (new_state.rows, ply) in self.G:
+            #if new_state.rows in self.G:
+            if ply in self.G:
+                #if self.G[(new_state.rows, ply)] >= maxG:
+                #if self.G[new_state.rows] >= maxG:
+                if self.G[ply] >= maxG:
+                    next_move = ply
+                    #maxG = self.G[(new_state.rows, ply)]
+                    #maxG = self.G[new_state.rows]
+                    maxG = self.G[ply]
+            else:
+                next_move = random.choice(possible_moves)
 
         return next_move
 
@@ -47,8 +73,6 @@ class Agent(object):
         self.state_history.append((state, reward))
 
     def learn(self):
-
-        self.random_factor -= 0.005
         target = 0
 
         for prev, reward in reversed(self.state_history):

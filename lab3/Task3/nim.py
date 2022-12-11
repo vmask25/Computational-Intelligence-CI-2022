@@ -38,19 +38,6 @@ class Nim:
         self._rows = sorted([x for x in self._rows if x > 0])
         return self
 
-    def get_reward(self):
-        if self.rows == (0,0):
-            return 0
-        else:
-            return -1
-        #if nim_sum(self) == 0:
-        #    return 0
-        #else:
-        #    return -1
-
-    def possible_moves(self):
-        return [(r, o) for r, c in enumerate(self.rows) for o in range(1, c + 1)]
-
 # Strategy class
 class Strategy:
     def __init__(self, dna: list) -> None:
@@ -76,7 +63,7 @@ def gabriele(state: Nim) -> Nimply:
 
 # Opponent strategy generator (based on the evolution turn)
 def opponent_strategy() -> Strategy:
-    return Strategy([gabriele])
+    return Strategy([optimal_strategy])
 
 # Optimal function 
 def nim_sum(state: Nim) -> int:
