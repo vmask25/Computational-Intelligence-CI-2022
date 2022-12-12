@@ -72,16 +72,16 @@ def gabriele(state: Nim) -> Nimply:
 
 # Opponent strategy generator (based on the evolution turn)
 def opponent_strategy() -> Strategy:
+    return Strategy([gabriele])
     #return Strategy([pure_random])
     #return Strategy([optimal_strategy])
-    #return Strategy([gabriele])
-    return new_strategy()
+    #return new_strategy()
 
 def opponent_strategy_evaluate() -> Strategy:
+    return Strategy([gabriele])
     #return Strategy([pure_random])
     #return Strategy([optimal_strategy])
-    #return Strategy([gabriele])
-    return new_strategy()
+    #return new_strategy()
 
 # Optimal function 
 def nim_sum(state: Nim) -> int:
