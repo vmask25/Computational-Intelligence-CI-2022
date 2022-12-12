@@ -9,7 +9,7 @@ from agent import Agent
 
 NIM_SIZE = 5
 NUM_MATCHES_EVAL = 10
-EPISODES = 10000
+EPISODES = 7000
 
 def evaluate(robot: Agent, player2: Strategy) -> float:
     won = 0
@@ -63,6 +63,7 @@ if __name__ == "__main__":
                 ply = opponent(board)
                 board.nimming(ply)
             i+=1
+        # The agent updates its G dictionary
         robot.learn()
 
         # Evaluation of the current agent

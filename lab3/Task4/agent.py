@@ -12,6 +12,9 @@ class Agent(object):
         self.G = {}
         self.init_reward(board)
 
+    # Initialize the G dictionary. Choosing one of the commented rows allows to use a different "state" in the algorithm.
+    # NOTE: if you choose to put the current rows or the current rows + the ply as state you also need to calculate the board_tmp 
+    # and the possible_state in which the ply leads, so it's slower.
     def init_reward(self, board: Nim, possible_moves = None):
         if possible_moves == None:
             possible_moves = board.possible_moves() 
@@ -24,6 +27,9 @@ class Agent(object):
                 #self.G[possible_state.rows] = np.random.uniform(low=1.0, high=0.1)
                 self.G[ply] = np.random.uniform(low=1.0, high=0.1)            
 
+    # Choosing the action to perform while training the agent. Choosing one of the commented rows allows to use a different "state" in the algorithm.
+    # NOTE: if you choose to put the new state rows or the new state rows + the ply as state you also need to calculate the board_tmp 
+    # and the new_state in which the ply leads, so it's slower.
     def choose_action(self, board, possible_moves):
         maxG = -10e15
         next_move = None
@@ -47,6 +53,10 @@ class Agent(object):
 
         return next_move
 
+    # Choosing the action to perform at the end of the training, so it's not necessary to pick a random choice based on the random_factor.
+    # Choosing one of the commented rows allows to use a different "state" in the algorithm.
+    # NOTE: if you choose to put the new state rows or the new state rows + the ply as state you also need to calculate the board_tmp 
+    # and the new_state in which the ply leads, so it's slower.
     def choose_action_evaluate(self, board, possible_moves):
         maxG = -10e15
         next_move = None
@@ -72,6 +82,7 @@ class Agent(object):
     def update_state_history(self, state, reward):
         self.state_history.append((state, reward))
 
+    # Learning function in which the G dictionary is updated.
     def learn(self):
         target = 0
 
