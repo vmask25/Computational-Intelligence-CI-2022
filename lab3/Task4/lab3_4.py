@@ -72,10 +72,11 @@ if __name__ == "__main__":
             moveHistory.append(results)
             indices.append(e)
 
-        # Saving the current agent if it performes better in the evaluation
-        if results >= max:
-            max = results
-            best_agent = robot
+        # Saving the current agent if it performes better in the evaluation 
+        # (then commented to allow continuous learning in the future)
+        #if results >= max:
+        #    max = results
+        #    best_agent = robot
 
         # Resetting the board
         board = Nim(NIM_SIZE)
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     meanHistory2 = []
     # Final evaluation of the best agent
     for c in tqdm(range(500)):
-        results = evaluate(best_agent, nim.opponent_strategy_evaluate())
+        results = evaluate(robot, nim.opponent_strategy_evaluate())
         meanHistory2.append(results)
         if c % 10 == 0:
             moveHistory2.append(results)
